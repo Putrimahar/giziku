@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.giziku.ui.theme.Awal
 import com.example.giziku.ui.theme.DetailAnakScreen
 import com.example.giziku.ui.theme.EditProfileScreen
@@ -50,8 +52,6 @@ class MainActivity : ComponentActivity() {
                 composable("teacherhomescreen") { TeacherHomeScreen(navController) }
                 composable("teacherprofilescreen") { TeacherProfileScreen(navController) }
                 composable("teacherprofileeditscreen") { TeacherProfileEditScreen(navController) }
-                composable("teacherstudentlistscreen") { TeacherStudentListScreen(navController) }
-
 
                 composable("home") { MedisHomeScreen(navController) } // Pastikan ini benar
                 composable("edit_profile") { EditProfileScreen(navController) }
@@ -72,8 +72,17 @@ class MainActivity : ComponentActivity() {
                     DetailAnakScreen(
                         anakId = anakId,
                         userViewModel = viewModel(), // atau pakai remember / inject sesuai kebutuhanmu
+                        navController = navController, // Menambahkan navController di sini
                         onBack = { navController.popBackStack() }
                     )
+                }
+
+                composable(
+                    "teacherstudentlistscreen/{kelas}",
+                    arguments = listOf(navArgument("kelas") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val kelas = backStackEntry.arguments?.getString("kelas") ?: ""
+                    TeacherStudentListScreen(navController, kelas)
                 }
 
 

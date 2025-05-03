@@ -21,6 +21,7 @@ data class AnakEntity(
     val beratBadan: String,
     val tinggiBadan: String,
     val kodeUnik: String,
-    val orangTuaId: Long
+    val orangTuaId: Long,
+    val kelas: String? = null
 )
 

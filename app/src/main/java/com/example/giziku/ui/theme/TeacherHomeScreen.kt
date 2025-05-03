@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.giziku.R
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.model.ProfileOrangTua
 import com.example.giziku.model.ProfileTenagaPendidikan
 import com.example.giziku.model.User
@@ -58,11 +59,15 @@ import com.example.giziku.util.UserViewModelFactory
 fun TeacherHomeScreen(navController: NavController) {
     val context = LocalContext.current
     var profile by remember { mutableStateOf<ProfileTenagaPendidikan?>(null) }
+    var siswaDiKelas by remember { mutableStateOf<List<AnakEntity>>(emptyList()) }
 
     val application = context.applicationContext as Application
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
 
+    // Menggunakan LaunchedEffect untuk menjalankan suspend function dalam coroutine
     LaunchedEffect(Unit) {
+        // Memanggil getAnakByKelas dalam coroutine
+        siswaDiKelas = userViewModel.getAnakByKelas("1A") // misalnya kelas 1A
         val currentUserId = userViewModel.getCurrentUserId()
         val fetchedProfile = userViewModel.getProfileTenagaPendidikanByUserId(currentUserId)
         profile = fetchedProfile
@@ -174,13 +179,23 @@ fun TeacherHomeScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(14.dp))
 
         val kelasList = listOf(
-            "Kelas 1A", "Kelas 2A", "Kelas 3A", "Kelas 4A", "Kelas 5A", "Kelas 6A",
-            "Kelas 1B", "Kelas 2B", "Kelas 3B", "Kelas 4B"
+            "Kelas 1A",
+            "Kelas 2A",
+            "Kelas 3A",
+            "Kelas 4A",
+            "Kelas 5A",
+            "Kelas 6A",
+            "Kelas 1B",
+            "Kelas 2B",
+            "Kelas 3B",
+            "Kelas 4B",
+            "Kelas 5B",
+            "Kelas 6B"
         )
 
         kelasList.forEach { kelas ->
             OutlinedButton(
-                onClick = { navController.navigate("teacherstudentlistscreen") },
+                onClick = { navController.navigate("teacherstudentlistscreen/${kelas}") },
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, Color(0xFF004D40)),
                 modifier = Modifier

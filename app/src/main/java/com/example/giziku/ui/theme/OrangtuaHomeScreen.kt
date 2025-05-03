@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,10 +20,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -239,7 +244,8 @@ fun EdukasiCard() {
 fun DetailAnakScreen(
     anakId: Int,
     userViewModel: UserViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    navController: NavController
 ) {
     var anak by remember { mutableStateOf<AnakEntity?>(null) }
 
@@ -251,22 +257,81 @@ fun DetailAnakScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .background(Color(0xFFF8F6F2))
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Detail Anak", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            // Header
+            Row(
+
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { navController.popBackStack() }) { // Kembali ke Home
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color(0xFF127369)
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Detail Anak", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Foto Anak
+            Image(
+                painter = painterResource(id = R.drawable.profile_placeholder),
+                contentDescription = "Foto Anak",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.Gray, CircleShape)
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(text = "Nama: ${it.nama}", fontSize = 18.sp)
-            Text(text = "Tanggal Lahir: ${it.tanggalLahir}", fontSize = 18.sp)
-            Text(text = "Jenis Kelamin: ${it.jenisKelamin}", fontSize = 18.sp)
-            Text(text = "Kode Unik: ${it.kodeUnik}", fontSize = 18.sp)
+            // Informasi Anak
+            ProfileItem(label = "Nama Anak", value = it.nama)
+            ProfileItem(label = "Jenis Kelamin", value = it.jenisKelamin)
+            ProfileItem(label = "Tanggal Lahir", value = it.tanggalLahir)
+            ProfileItem(label = "Tinggi Badan", value = it.tinggiBadan)
+            ProfileItem(label = "Berat Badan", value = it.beratBadan)
+            ProfileItem(label = "Kode Unik", value = it.kodeUnik)
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = onBack) {
-                Text("Kembali")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // Tombol Edit
+                Button(
+                    onClick = { navController.navigate("editAnak/$anakId") },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF127369)),
+                    modifier = Modifier.weight(1f).padding(end = 8.dp)
+                ) {
+                    Text("Edit", color = Color.White)
+                }
+
+                // Tombol Hapus
+                Button(
+                    onClick = {
+                        userViewModel.deleteAnak(anakId)
+                        onBack() // Setelah hapus, kembali ke halaman sebelumnya
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF127369)),
+                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                ) {
+                    Text("Hapus", color = Color.White)
+                }
             }
+
         }
     } ?: run {
         Column(

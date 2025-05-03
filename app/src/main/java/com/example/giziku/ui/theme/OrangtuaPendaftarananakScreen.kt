@@ -1,6 +1,5 @@
 package com.example.giziku.ui.theme
 
-import com.example.giziku.model.AnakEntity
 import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -29,7 +28,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.giziku.R
-import com.example.giziku.model.ProfileOrangTua
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.util.UserViewModel
 import com.example.giziku.util.UserViewModelFactory
 

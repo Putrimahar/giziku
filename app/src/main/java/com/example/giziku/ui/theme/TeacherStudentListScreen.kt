@@ -1,10 +1,12 @@
 package com.example.giziku.ui.theme
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,19 +14,41 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.giziku.model.AnakEntity
+import com.example.giziku.util.UserViewModel
+import com.example.giziku.util.UserViewModelFactory
 
 @Composable
-fun TeacherStudentListScreen(navController: NavController) {
+fun TeacherStudentListScreen(navController: NavController, kelas: String) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
+
+    var siswaList by remember { mutableStateOf<List<AnakEntity>>(emptyList()) }
+
+    // Gunakan LaunchedEffect untuk memanggil suspend function dalam coroutine
+    LaunchedEffect(kelas) {
+        // Panggil suspend function getAnakByKelas di sini
+        siswaList = userViewModel.getAnakByKelas(kelas)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,22 +58,19 @@ fun TeacherStudentListScreen(navController: NavController) {
             IconButton(onClick = { navController.navigate("teacherhomescreen") }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            Text(
-                text = "Kelas 2B",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(start = 8.dp)
-            )
         }
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.DarkGray)
 
         LazyColumn {
-            items(9) {
+            items(siswaList) { siswa ->
                 StudentCard(
-                    name = "Fitriya Nur Alyashifa",
-                    birthDate = "Minggu, 14 September 2004",
-                    gender = "Perempuan",
-                    onClick = {navController.navigate("gurulaporangizianak") }
+                    name = siswa.nama,
+                    birthDate = siswa.tanggalLahir,
+                    gender = siswa.jenisKelamin,
+                    onClick = {
+                        navController.navigate("gurulaporangizianak")
+                    }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }

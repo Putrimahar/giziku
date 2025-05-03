@@ -13,7 +13,7 @@ import com.example.giziku.model.User
 @Database(
     entities = [User::class, ProfileOrangTua::class, ProfileTenagaPendidikan::class, ProfileTenagaMedis::class
                , AnakEntity::class],
-    version = 20,  // Pastikan untuk memperbarui versi jika ada perubahan skema
+    version = 21,  // Pastikan untuk memperbarui versi jika ada perubahan skema
     exportSchema = false  // Jika Anda tidak ingin mengekspor skema ke file
 )
 abstract class AppDatabase : RoomDatabase() {

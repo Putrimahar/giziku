@@ -2,6 +2,8 @@ package com.example.giziku.util
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.giziku.database.AppDatabase
@@ -153,8 +155,37 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteAnak(anakId: Int) {
+        viewModelScope.launch {
+            // Menjalankan operasi penghapusan di background thread
+            userRepository.deleteAnakById(anakId)
+        }
+    }
+
     suspend fun getAnakById(id: Int): AnakEntity? {
         return userRepository.getAnakById(id)
     }
+
+    suspend fun getAnakByKodeUnik(kode: String): AnakEntity? {
+        return anakDao.getAnakByKodeUnik(kode)
+    }
+
+    fun updateAnak(anak: AnakEntity) {
+        viewModelScope.launch {
+            userRepository.updateAnak(anak)
+        }
+    }
+
+    suspend fun getAnakByKelas(kelas: String): List<AnakEntity> {
+        return userRepository.getAnakByKelas(kelas)
+    }
+
+    private val _selectedKelas = mutableStateOf<String?>(null)
+    val selectedKelas: State<String?> get() = _selectedKelas
+
+    fun setSelectedKelas(kelas: String) {
+        _selectedKelas.value = kelas
+    }
+
 
 }
