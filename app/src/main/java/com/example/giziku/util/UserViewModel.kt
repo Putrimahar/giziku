@@ -6,11 +6,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.giziku.database.AppDatabase
 import com.example.giziku.database.UserRepository
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.model.ProfileOrangTua
 import com.example.giziku.model.ProfileTenagaMedis
 import com.example.giziku.model.ProfileTenagaPendidikan
 import com.example.giziku.model.User
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository: UserRepository
@@ -18,9 +20,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val profileOrangTuaDao = AppDatabase.getDatabase(application).profileOrangTuaDao()
     private val profileTenagaPendidikanDao = AppDatabase.getDatabase(application).profileTenagaPendidikanDao()
     private val profileTenagaMedisDao = AppDatabase.getDatabase(application).profileTenagaMedisDao()
+    private val anakDao = AppDatabase.getDatabase(application).anakDao()
 
     init {
-        userRepository = UserRepository(userDao, profileOrangTuaDao, profileTenagaPendidikanDao, profileTenagaMedisDao)
+        userRepository = UserRepository(userDao, profileOrangTuaDao, profileTenagaPendidikanDao, profileTenagaMedisDao, anakDao)
     }
 
     fun logout() {
@@ -138,4 +141,16 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         return sharedPrefs.getLong("currentUserId", -1L)
     }
 
+    fun insertAnak(anak: AnakEntity, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            anakDao.insertAnak(anak)
+            onSuccess()
+        }
+    }
+
+    fun getAnakByOrangTuaId(orangTuaId: Long): List<AnakEntity> {
+        return runBlocking {
+            userRepository.getAnakByOrangTuaId(orangTuaId)
+        }
+    }
 }

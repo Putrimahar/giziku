@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.model.ProfileOrangTua
 import com.example.giziku.model.ProfileTenagaPendidikan
 import com.example.giziku.model.ProfileTenagaMedis
 import com.example.giziku.model.User
 
 @Database(
-    entities = [User::class, ProfileOrangTua::class, ProfileTenagaPendidikan::class, ProfileTenagaMedis::class],
-    version = 17,  // Pastikan untuk memperbarui versi jika ada perubahan skema
+    entities = [User::class, ProfileOrangTua::class, ProfileTenagaPendidikan::class, ProfileTenagaMedis::class
+               , AnakEntity::class],
+    version = 20,  // Pastikan untuk memperbarui versi jika ada perubahan skema
     exportSchema = false  // Jika Anda tidak ingin mengekspor skema ke file
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -20,6 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileOrangTuaDao(): ProfileOrangTuaDao
     abstract fun profileTenagaPendidikanDao(): ProfileTenagaPendidikanDao
     abstract fun profileTenagaMedisDao(): ProfileTenagaMedisDao
+    abstract fun anakDao(): AnakDao
 
     companion object {
         @Volatile

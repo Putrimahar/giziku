@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.model.ProfileOrangTua
 import com.example.giziku.model.ProfileTenagaMedis
 import com.example.giziku.model.ProfileTenagaPendidikan
@@ -52,6 +53,10 @@ interface ProfileTenagaPendidikanDao {
 
     @Query("DELETE FROM profileTenagaPendidikan WHERE userTenagaPendidikanId = :userId")
     suspend fun deleteProfileByUserId(userId: Long)
+
+    @Query("SELECT * FROM anak WHERE kodeUnik = :kode")
+    suspend fun getAnakByKode(kode: String): AnakEntity?
+
 }
 
 @Dao

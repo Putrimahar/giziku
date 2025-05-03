@@ -85,7 +85,6 @@ fun OrangtuaEditProfileScreen(navController: NavController) {
         }
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()

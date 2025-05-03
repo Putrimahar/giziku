@@ -2,6 +2,7 @@ package com.example.giziku.database
 
 import android.util.Log
 import androidx.room.Transaction
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.model.ProfileOrangTua
 import com.example.giziku.model.ProfileTenagaMedis
 import com.example.giziku.model.ProfileTenagaPendidikan
@@ -11,7 +12,8 @@ class UserRepository(
     private val userDao: UserDao,
     private val profileOrangTuaDao: ProfileOrangTuaDao,
     private val profileTenagaPendidikanDao: ProfileTenagaPendidikanDao,
-    private val profileTenagaMedisDao: ProfileTenagaMedisDao
+    private val profileTenagaMedisDao: ProfileTenagaMedisDao,
+    private val anakDao: AnakDao
 ) {
     @Transaction
     suspend fun insertUserAndProfile(profile: ProfileOrangTua) {
@@ -81,5 +83,10 @@ class UserRepository(
     suspend fun insertUserAndGetId(user: User): Long {
         return userDao.insertUser(user) // pastikan DAO insertUser return Long
     }
+
+    suspend fun getAnakByOrangTuaId(orangTuaId: Long): List<AnakEntity> {
+        return anakDao.getAnakByOrangTuaId(orangTuaId)
+    }
+
 
 }

@@ -1,5 +1,7 @@
 package com.example.giziku.ui.theme
 
+import com.example.giziku.model.AnakEntity
+import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +38,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.giziku.R
+import com.example.giziku.model.ProfileOrangTua
+import com.example.giziku.util.UserViewModel
+import com.example.giziku.util.UserViewModelFactory
+
 
 @Composable
 fun OrangtuaPendaftarananakScreen(navController: NavController) {
@@ -49,6 +58,10 @@ fun OrangtuaPendaftarananakScreen(navController: NavController) {
     var jenisKelamin by remember { mutableStateOf("") }
     var beratBadan by remember { mutableStateOf("") }
     var tinggiBadan by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
 
     Column(
         modifier = Modifier
@@ -137,13 +150,35 @@ fun OrangtuaPendaftarananakScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+
         Button(
-            onClick = { /* TODO: Simpan data */ },
+            onClick = {
+                val currentUserId = userViewModel.getCurrentUserId()
+                if (currentUserId != -1L) {
+                    val kodeUnik = generateKodeUnik()
+                    val anak = AnakEntity(
+                        nama = nama,
+                        tanggalLahir = tanggalLahir,
+                        jenisKelamin = jenisKelamin,
+                        beratBadan = beratBadan,
+                        tinggiBadan = tinggiBadan,
+                        kodeUnik = kodeUnik,
+                        orangTuaId =  currentUserId                  // ← Diperbaiki di sini
+                    )
+                    userViewModel.insertAnak(anak) {
+                        navController.navigate("homeorangtua") {
+                            popUpTo("orangtua_pendaftarananak") { inclusive = true }
+                        }
+                    }
+                } else {
+                    // Bisa ditambahkan notifikasi/snackbar bahwa user belum login
+                }
+            },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF127369)),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Simpan", color = Color.White)
+            Text("Simpan", color = Color.White)
         }
     }
 }
@@ -163,4 +198,11 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, placeholder:
             unfocusedBorderColor = Color(0xFF127369)
         )
     )
+}
+
+fun generateKodeUnik(): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return "ANK-" + (1..6)
+        .map { chars.random() }
+        .joinToString("")
 }

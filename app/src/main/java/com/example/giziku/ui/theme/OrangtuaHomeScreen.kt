@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.giziku.R
-import com.example.giziku.model.ProfileOrangTua
+import com.example.giziku.model.AnakEntity
 import com.example.giziku.util.UserViewModel
 import com.example.giziku.util.UserViewModelFactory
 
@@ -52,22 +51,22 @@ import com.example.giziku.util.UserViewModelFactory
 @Composable
 fun OrangtuaHomeScreen(navController: NavController) {
     val context = LocalContext.current
-    var profile by remember { mutableStateOf<ProfileOrangTua?>(null) }
+    var anakList by remember { mutableStateOf<List<AnakEntity>>(emptyList()) }
 
     val application = context.applicationContext as Application
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
 
     LaunchedEffect(Unit) {
         val currentUserId = userViewModel.getCurrentUserId()
-        val fetchedProfile = userViewModel.getProfileOrangTuaByUserId(currentUserId)
-        profile = fetchedProfile
-        Log.d("OrangtuaHomeScreen", "Profile fetched successfully: ${fetchedProfile?.username}")
+        val fetchedAnak = userViewModel.getAnakByOrangTuaId(currentUserId)
+        anakList = fetchedAnak
+        Log.d("OrangtuaHomeScreen", "Jumlah anak ditemukan: ${fetchedAnak.size}")
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // Tambahkan scroll
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.Start
     ) {
@@ -82,41 +81,41 @@ fun OrangtuaHomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Profile Card
-        profile?.let {
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+        // Menampilkan daftar anak
+        if (anakList.isEmpty()) {
+            Text(text = "Belum ada data anak.", fontSize = 14.sp)
+        } else {
+            anakList.forEach { anak ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_placeholder), // Ganti sesuai asset
-                        contentDescription = "Profile Image",
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column {
-                        Text(
-                            text = "Nama Lengkap: ${it.username}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.profile_placeholder),
+                            contentDescription = "Foto Anak",
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(CircleShape)
+                                .background(Color.Gray)
                         )
-                        Text(text = "Tanggal Lahir: ${it.tanggalLahir}", fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-                        Text(text = "Jenis Kelamin: ${it.jenisKelamin}", fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Column {
+                            Text("Nama Anak: ${anak.nama}", fontWeight = FontWeight.Bold)
+                            Text("Tanggal Lahir: ${anak.tanggalLahir}", fontSize = 12.sp)
+                            Text("Jenis Kelamin: ${anak.jenisKelamin}", fontSize = 12.sp)
+                            Text("Kode Unik: ${anak.kodeUnik}", fontSize = 12.sp)
+                        }
                     }
                 }
             }
-        } ?: run {
-            // Jika data profile belum ada, tampilkan teks loading atau placeholder
-            Text(text = "Memuat profil...", fontSize = 14.sp)
         }
 
         Spacer(modifier = Modifier.height(12.dp))

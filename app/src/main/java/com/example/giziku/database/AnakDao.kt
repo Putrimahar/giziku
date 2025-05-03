@@ -1,0 +1,21 @@
+package com.example.giziku.database
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.example.giziku.model.AnakEntity
+
+@Dao
+interface AnakDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAnak(anak: AnakEntity)
+
+    @Query("SELECT * FROM anak WHERE orangTuaId = :orangTuaId")
+    suspend fun getAnakByOrangTuaId(orangTuaId: Long): List<AnakEntity>
+
+    @Query("SELECT * FROM anak WHERE kodeUnik = :kode")
+    suspend fun getAnakByKodeUnik(kode: String): AnakEntity?
+
+}
