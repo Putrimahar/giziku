@@ -96,12 +96,24 @@ class UserRepository(
         anakDao.deleteAnakById(anakId)
     }
 
-    suspend fun updateAnak(anak: AnakEntity) {
-        anakDao.updateAnak(anak)
+    suspend fun insertAnakKeKelas(anak: AnakEntity) {
+        anakDao.insertAnakKeKelas(anak)
     }
 
     suspend fun getAnakByKelas(kelas: String): List<AnakEntity> {
         return anakDao.getAnakByKelas(kelas)
+    }
+
+    suspend fun isAnakAlreadyExist(anakId: String): Boolean {
+        return anakDao.getAnakById(anakId) != null
+    }
+
+    suspend fun getAnakById(id: String): AnakEntity? {
+        return anakDao.getAnakById(id)
+    }
+
+    suspend fun updateAnak(anak: AnakEntity) {
+        anakDao.updateAnak(anak)
     }
 
 }

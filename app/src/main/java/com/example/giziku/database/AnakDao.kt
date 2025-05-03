@@ -11,7 +11,7 @@ import com.example.giziku.model.AnakEntity
 @Dao
 interface AnakDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAnak(anak: AnakEntity)
 
     @Query("SELECT * FROM anak WHERE orangTuaId = :orangTuaId")
@@ -35,5 +35,10 @@ interface AnakDao {
     @Query("SELECT * FROM anak WHERE kelas = :kelas")
     suspend fun getAnakByKelas(kelas: String): List<AnakEntity>
 
+    @Query("SELECT * FROM anak WHERE id = :id LIMIT 1")
+    suspend fun getAnakById(id: String): AnakEntity?
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertAnakKeKelas(anak: AnakEntity)
 
 }

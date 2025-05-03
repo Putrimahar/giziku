@@ -170,12 +170,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         return anakDao.getAnakByKodeUnik(kode)
     }
 
-    fun updateAnak(anak: AnakEntity) {
+    fun updateAnak(anak: AnakEntity, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             userRepository.updateAnak(anak)
+            onSuccess() // Callback success
         }
     }
-
     suspend fun getAnakByKelas(kelas: String): List<AnakEntity> {
         return userRepository.getAnakByKelas(kelas)
     }
@@ -187,5 +187,8 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         _selectedKelas.value = kelas
     }
 
+    suspend fun isAnakAlreadyExist(anakId: String): Boolean {
+        return anakDao.getAnakById(anakId) != null
+    }
 
 }

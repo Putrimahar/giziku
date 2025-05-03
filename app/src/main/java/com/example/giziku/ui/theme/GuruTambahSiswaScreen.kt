@@ -22,8 +22,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,11 @@ import androidx.navigation.NavController
 import com.example.giziku.util.UserViewModel
 import com.example.giziku.util.UserViewModelFactory
 import kotlinx.coroutines.launch
+import android.widget.Toast
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+
 
 @Composable
 fun GuruTambahSiswaScreen(navController: NavController) {
@@ -68,10 +75,27 @@ fun GuruTambahSiswaScreen(navController: NavController) {
     val application = context.applicationContext as Application
     val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
 
+    var anakId by remember { mutableStateOf("") }
+    var showMessage by remember { mutableStateOf<String?>(null) }
+
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+
+    LaunchedEffect(anakId) {
+        if (anakId.isNotBlank()) {
+            val exist = userViewModel.isAnakAlreadyExist(anakId)
+            if (exist) {
+                showMessage = "Kode sudah digunakan!"
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState())
+        ,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top bar sederhana
@@ -96,8 +120,19 @@ fun GuruTambahSiswaScreen(navController: NavController) {
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF004D40),
                 unfocusedBorderColor = Color(0xFF004D40)
-            )
+            ),
+            isError = errorMessage != null // This sets the error state of the text field
         )
+
+        // Display error message below the text field
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall, // You can change the style if needed
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,18 +167,37 @@ fun GuruTambahSiswaScreen(navController: NavController) {
         Button(
             onClick = {
                 scope.launch {
-                    val anak = userViewModel.getAnakByKodeUnik(idSiswa.text.trim())
-                    if (anak != null) {
-                        val updatedAnak = anak.copy(kelas = selectedKelas)
-                        userViewModel.updateAnak(updatedAnak)
-                        snackbarHostState.showSnackbar("Siswa berhasil ditambahkan ke kelas $selectedKelas")
-
-                        navController.navigate("teacherHomeScreen") {
-                            popUpTo("tambahsiswa") { inclusive = true }
-                        }
+                    val kodeInput = idSiswa.text.trim()
+                    // Cek apakah ID sudah terpakai
+                    if (idSiswa.text.isBlank()) {
+                        errorMessage = "ID tidak boleh kosong"
                     } else {
-                        snackbarHostState.showSnackbar("Kode tidak ditemukan. Pastikan kode benar.")
+                        // Ambil anak berdasarkan kode unik (idSiswa)
+                        val anak = userViewModel.getAnakByKodeUnik(idSiswa.text.trim())
+
+                        if (anak != null) {
+                            // Cek apakah anak sudah terdaftar di kelas
+                            if (anak.kelas != null && anak.kelas.isNotEmpty()) {
+                                // Jika anak sudah terdaftar di kelas, tampilkan error message
+                                errorMessage = "ID sudah terdaftar di kelas ${anak.kelas}. Tidak bisa ditambahkan lagi."
+                            } else {
+                                // Jika anak belum terdaftar di kelas, lanjutkan dengan penambahan ke kelas baru
+                                val updatedAnak = anak.copy(kelas = selectedKelas)
+                                userViewModel.updateAnak(updatedAnak) {
+                                    scope.launch {
+                                        Toast.makeText(context, "Siswa berhasil ditambahkan ke kelas $selectedKelas", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("teacherHomeScreen") {
+                                            popUpTo("tambahsiswa") { inclusive = true }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // Jika ID tidak ditemukan, tampilkan error message
+                            errorMessage = "Kode tidak ditemukan. Pastikan kode benar."
+                        }
                     }
+
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
