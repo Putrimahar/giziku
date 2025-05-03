@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.giziku.model.AnakEntity
@@ -52,15 +54,24 @@ fun TeacherStudentListScreen(navController: NavController, kelas: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(24.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { navController.navigate("teacherhomescreen") }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) { // Kembali ke Home
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color(0xFF127369)
+                )
             }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = " $kelas ", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
-
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.DarkGray)
+
 
         LazyColumn {
             items(siswaList) { siswa ->
@@ -69,12 +80,13 @@ fun TeacherStudentListScreen(navController: NavController, kelas: String) {
                     birthDate = siswa.tanggalLahir,
                     gender = siswa.jenisKelamin,
                     onClick = {
-                        navController.navigate("gurulaporangizianak")
+                        navController.navigate("gurulaporangizianak/${siswa.kodeUnik}")
                     }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
         }
+
     }
 }
 

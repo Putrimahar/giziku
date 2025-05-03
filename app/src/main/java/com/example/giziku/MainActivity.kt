@@ -25,7 +25,6 @@ import com.example.giziku.ui.theme.OrangtuaPendaftarananakScreen
 import com.example.giziku.ui.theme.OrangtuaProfileScreen
 import com.example.giziku.ui.theme.ProfileMedis
 import com.example.giziku.ui.theme.Register
-import com.example.giziku.ui.theme.Role
 import com.example.giziku.ui.theme.TeacherHomeScreen
 import com.example.giziku.ui.theme.TeacherProfileEditScreen
 import com.example.giziku.ui.theme.TeacherProfileScreen
@@ -47,7 +46,6 @@ class MainActivity : ComponentActivity() {
                 composable("awal") { Awal(navController) }
                 composable("login") { Login(navController) }
                 composable("register") { Register(navController) }
-                composable("role") { Role(navController) }
 
                 composable("teacherhomescreen") { TeacherHomeScreen(navController) }
                 composable("teacherprofilescreen") { TeacherProfileScreen(navController) }
@@ -59,7 +57,13 @@ class MainActivity : ComponentActivity() {
                 composable("grafik") { GrafikScreen(navController) }
                 composable("edukasi_gizi") { EdukasiGiziMedis(navController) }
                 composable("tambahsiswa") { GuruTambahSiswaScreen(navController) }
-                composable("gurulaporangizianak") { GuruLaporanGizianakScreen() }
+                composable(
+                    route = "gurulaporangizianak/{anakId}",
+                    arguments = listOf(navArgument("anakId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val anakId = backStackEntry.arguments?.getString("anakId") ?: ""
+                    GuruLaporanGizianakScreen(anakId = anakId, userViewModel = userViewModel, navController)
+                }
 
                 composable("homeorangtua") { OrangtuaHomeScreen(navController) } // Pastikan ini benar
                 composable("pendaftaran") { OrangtuaPendaftarananakScreen(navController) } // Pastikan ini benar

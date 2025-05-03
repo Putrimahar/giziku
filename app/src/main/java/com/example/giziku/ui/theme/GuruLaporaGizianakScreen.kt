@@ -14,16 +14,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.giziku.model.AnakEntity
+import com.example.giziku.util.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GuruLaporanGizianakScreen() {
-    var selectedKelas by remember { mutableStateOf("2A") }
-    var selectedWaliKelas by remember { mutableStateOf("Himawan, S.Pd") }
+fun GuruLaporanGizianakScreen(anakId: String, userViewModel: UserViewModel, navController: NavController) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var anak by remember { mutableStateOf<AnakEntity?>(null) }
 
-    val kelasList = listOf("1A", "1B", "2A", "2B", "3A")
-    val waliKelasList = listOf("Himawan, S.Pd", "Rina, M.Pd", "Budi, S.Pd")
+    val kelasList = listOf(
+        "Kelas 1A",
+        "Kelas 2A",
+        "Kelas 3A",
+        "Kelas 4A",
+        "Kelas 5A",
+        "Kelas 6A",
+        "Kelas 1B",
+        "Kelas 2B",
+        "Kelas 3B",
+        "Kelas 4B",
+        "Kelas 5B",
+        "Kelas 6B"
+    )
+
+    // Load data anak dari ViewModel
+    LaunchedEffect(anakId) {
+        anak = userViewModel.getAnakByKodeUnik(anakId)
+    }
 
     val scrollState = rememberScrollState()
 
@@ -31,16 +55,23 @@ fun GuruLaporanGizianakScreen() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(24.dp)
     ) {
-        TopAppBar(
-            title = { Text("Data Siswa") },
-            navigationIcon = {
-                IconButton(onClick = { /* handle back */ }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) { // Kembali ke Home
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color(0xFF127369)
+                )
             }
-        )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Data Siswa", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = Color.DarkGray)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -54,36 +85,15 @@ fun GuruLaporanGizianakScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        ReadOnlyTextField(label = "Nama Lengkap", value = "Putri Maharani")
-        ReadOnlyTextField(label = "NISN", value = "114476476")
-        ReadOnlyTextField(label = "Tanggal Lahir", value = "Kamis, 17 Maret 2016")
-        ReadOnlyTextField(label = "Jenis Kelamin", value = "Perempuan")
-        ReadOnlyTextField(label = "Golongan Darah", value = "A")
-
-        DropdownField(
-            label = "Kelas",
-            options = kelasList,
-            selectedOption = selectedKelas,
-            onOptionSelected = { selectedKelas = it }
-        )
-
-        DropdownField(
-            label = "Wali Kelas",
-            options = waliKelasList,
-            selectedOption = selectedWaliKelas,
-            onOptionSelected = { selectedWaliKelas = it }
-        )
+        anak?.let {
+            var selectedKelas by remember { mutableStateOf(it.kelas ?: kelasList.first()) }
+            TextField(label = "Nama Lengkap", value = it.nama)
+            TextField(label = "Tanggal Lahir", value = it.tanggalLahir ?: "-")
+            TextField(label = "Jenis Kelamin", value = it.jenisKelamin ?: "-")
+            TextField(label = "Kelas", value = it.kelas ?: "-")
+        }?: Text("Memuat data...", modifier = Modifier.align(Alignment.CenterHorizontally))
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* Simpan perubahan */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Simpan")
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         Text("Grafik Perkembangan", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
@@ -102,7 +112,7 @@ fun GuruLaporanGizianakScreen() {
 }
 
 @Composable
-fun ReadOnlyTextField(label: String, value: String) {
+fun TextField(label: String, value: String) {
     OutlinedTextField(
         value = value,
         onValueChange = {},
