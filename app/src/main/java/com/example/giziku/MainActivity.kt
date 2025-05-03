@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.giziku.ui.theme.Awal
+import com.example.giziku.ui.theme.DetailAnakScreen
 import com.example.giziku.ui.theme.EditProfileScreen
 import com.example.giziku.ui.theme.EdukasiGiziMedis
 import com.example.giziku.ui.theme.GrafikScreen
@@ -36,6 +37,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+            val application = applicationContext as Application
+            val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(application))
 
 
             NavHost(navController, startDestination = "awal") {
@@ -62,6 +65,17 @@ class MainActivity : ComponentActivity() {
                 composable("pendaftaran") { OrangtuaPendaftarananakScreen(navController) } // Pastikan ini benar
                 composable("profileorangtua") { OrangtuaProfileScreen(navController) } // Pastikan ini benar
                 composable("editprofileorangtua") { OrangtuaEditProfileScreen(navController) } // Pastikan ini benar
+                composable("detailAnak") { OrangtuaEditProfileScreen(navController) } // Pastikan ini benar
+
+                composable("detailanak/{id}") { backStackEntry ->
+                    val anakId = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: return@composable
+                    DetailAnakScreen(
+                        anakId = anakId,
+                        userViewModel = viewModel(), // atau pakai remember / inject sesuai kebutuhanmu
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
 
             }
         }

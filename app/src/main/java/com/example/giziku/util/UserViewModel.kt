@@ -88,7 +88,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-
     }
 
     // Fungsi untuk login user
@@ -153,4 +152,9 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             userRepository.getAnakByOrangTuaId(orangTuaId)
         }
     }
+
+    suspend fun getAnakById(id: Int): AnakEntity? {
+        return userRepository.getAnakById(id)
+    }
+
 }

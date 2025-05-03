@@ -89,7 +89,9 @@ fun OrangtuaHomeScreen(navController: NavController) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp)
+                        .clickable { navController.navigate("detailanak/${anak.id}")}
+                    ,
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Row(
@@ -134,7 +136,7 @@ fun OrangtuaHomeScreen(navController: NavController) {
         // Menu
         Card(
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -229,6 +231,52 @@ fun EdukasiCard() {
                     fontSize = 12.sp
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun DetailAnakScreen(
+    anakId: Int,
+    userViewModel: UserViewModel,
+    onBack: () -> Unit
+) {
+    var anak by remember { mutableStateOf<AnakEntity?>(null) }
+
+    LaunchedEffect(anakId) {
+        anak = userViewModel.getAnakById(anakId)
+    }
+
+    anak?.let {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            Text(text = "Detail Anak", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(text = "Nama: ${it.nama}", fontSize = 18.sp)
+            Text(text = "Tanggal Lahir: ${it.tanggalLahir}", fontSize = 18.sp)
+            Text(text = "Jenis Kelamin: ${it.jenisKelamin}", fontSize = 18.sp)
+            Text(text = "Kode Unik: ${it.kodeUnik}", fontSize = 18.sp)
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(onClick = onBack) {
+                Text("Kembali")
+            }
+        }
+    } ?: run {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Memuat data anak...")
         }
     }
 }

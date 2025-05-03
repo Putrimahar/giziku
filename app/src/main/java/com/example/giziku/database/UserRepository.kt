@@ -88,5 +88,10 @@ class UserRepository(
         return anakDao.getAnakByOrangTuaId(orangTuaId)
     }
 
+    suspend fun getAnakById(id: Int): AnakEntity? {
+        return anakDao.getAnakById(id)
+    }
+
+
 
 }

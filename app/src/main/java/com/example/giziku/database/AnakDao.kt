@@ -18,4 +18,7 @@ interface AnakDao {
     @Query("SELECT * FROM anak WHERE kodeUnik = :kode")
     suspend fun getAnakByKodeUnik(kode: String): AnakEntity?
 
+    @Query("SELECT * FROM anak WHERE id = :id")
+    suspend fun getAnakById(id: Int): AnakEntity?
+
 }
